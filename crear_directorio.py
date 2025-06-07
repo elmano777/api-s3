@@ -5,7 +5,11 @@ from botocore.exceptions import ClientError
 def lambda_handler(event, context):
     try:
         # Parse the request body
-        body = json.loads(event['body'])
+        if isinstance(event.get('body'), str):
+            body = json.loads(event['body'])
+        else:
+            body = event.get('body', {})
+            
         bucket_name = body.get('bucket_name')
         directory_name = body.get('directory_name')
         
@@ -51,4 +55,4 @@ def lambda_handler(event, context):
             'body': json.dumps({
                 'error': f'Error inesperado: {str(e)}'
             })
-        } 
+        }
