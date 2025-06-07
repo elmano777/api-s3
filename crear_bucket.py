@@ -20,13 +20,11 @@ def lambda_handler(event, context):
                 })
             }
         
-        # Create S3 client with explicit region
+        # Create S3 client
         s3_client = boto3.client('s3', region_name='us-east-1')
         
-        # Create the bucket
-        s3_client.create_bucket(
-            Bucket=bucket_name
-        )
+        # Create bucket (us-east-1 no necesita LocationConstraint)
+        s3_client.create_bucket(Bucket=bucket_name)
         
         return {
             'statusCode': 200,
@@ -48,4 +46,4 @@ def lambda_handler(event, context):
             'body': json.dumps({
                 'error': f'Error inesperado: {str(e)}'
             })
-        } 
+        }
