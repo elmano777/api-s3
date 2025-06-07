@@ -6,7 +6,11 @@ from botocore.exceptions import ClientError
 def lambda_handler(event, context):
     try:
         # Parse the request body
-        body = json.loads(event['body'])
+        if isinstance(event.get('body'), str):
+            body = json.loads(event['body'])
+        else:
+            body = event.get('body', {})
+            
         bucket_name = body.get('bucket_name')
         file_name = body.get('file_name')
         file_content = body.get('file_content')
@@ -20,18 +24,18 @@ def lambda_handler(event, context):
                 })
             }
         
-        # Ensure directory path ends with '/'
+        # Ensure directory path ends with '/' if it exists
         if directory_path and not directory_path.endswith('/'):
             directory_path += '/'
         
         # Decode base64 content if provided
         try:
             file_content = base64.b64decode(file_content)
-        except:
+        except Exception as decode_error:
             return {
                 'statusCode': 400,
                 'body': json.dumps({
-                    'error': 'El contenido del archivo debe estar en formato base64'
+                    'error': f'El contenido del archivo debe estar en formato base64. Error: {str(decode_error)}'
                 })
             }
         
@@ -65,4 +69,4 @@ def lambda_handler(event, context):
             'body': json.dumps({
                 'error': f'Error inesperado: {str(e)}'
             })
-        } 
+        }
