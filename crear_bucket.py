@@ -5,7 +5,11 @@ from botocore.exceptions import ClientError
 def lambda_handler(event, context):
     try:
         # Parse the request body
-        body = json.loads(event['body'])
+        if isinstance(event['body'], str):
+            body = json.loads(event['body'])
+        else:
+            body = event['body']
+            
         bucket_name = body.get('bucket_name')
         
         if not bucket_name:
